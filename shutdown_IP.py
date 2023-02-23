@@ -13,7 +13,7 @@ while contador <= numbermax:
     if txt == "shutdown /m \\\\10.10.{name}.{contador} /s /f":
         print(f'maquina 10.10.{name}.{contador} com sucesso')
     else:
-        os.system('cls')
+        #os.system('cls')
         print(f'maquina 10.10.{name}.{contador} não encontrada na rede')
 
     contador += 1
