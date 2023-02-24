@@ -1,0 +1,6 @@
+maquina 10.10.42.1 com sucesso
+maquina 10.10.42.2 com sucesso
+maquina 10.10.42.3 com sucesso
+maquina 10.10.42.1 não encontrada na rede | Maquina ja desligada
+maquina 10.10.42.2 não encontrada na rede | Maquina ja desligada
+maquina 10.10.42.3 não encontrada na rede | Maquina ja desligada
