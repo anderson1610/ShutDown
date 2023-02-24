@@ -1,0 +1,10 @@
+maquina 10.10.42.1 não encontrada na rede | Maquina ja desligada
+maquina 10.10.42.2 não encontrada na rede | Maquina ja desligada
+maquina 10.10.42.3 não encontrada na rede | Maquina ja desligada
+maquina 10.10.42.1 não encontrada na rede | Maquina ja desligada 2023-02-23 21:25:07.733309
+maquina 10.10.42.2 não encontrada na rede | Maquina ja desligada 2023-02-23 21:25:07.733309
+maquina 10.10.42.3 não encontrada na rede | Maquina ja desligada 2023-02-23 21:25:07.733309
+maquina 10.10.42.1 não encontrada na rede | Maquina ja desligada 2023-02-23 21:27:22.611827
+maquina 10.10.42.2 não encontrada na rede | Maquina ja desligada 2023-02-23 21:27:22.611827
+maquina 10.10.42.1 não encontrada na rede | Maquina ja desligada 2023-02-23 21:30:55.868666
+maquina 10.10.42.2 não encontrada na rede | Maquina ja desligada 2023-02-23 21:31:22.794224
