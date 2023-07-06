@@ -10,7 +10,7 @@ def month():
     today = datetime.today()
     return today.strftime("%b")
 
-def verificar_status_ping(sala, maquina, failed):
+def check_status_ping(sala, maquina, failed):
     comando_ping = ['ping', '-n', '2', f"10.10.{sala}.{maquina}"]  # Comando 'ping' para Windows
     resultado = subprocess.run(comando_ping, stdout=subprocess.PIPE)
     if resultado.returncode == 0:
@@ -46,7 +46,7 @@ def desligar_maquinas(name, start, numbermax, log_file):
     lista = [n for n in range(start, numbermax + 1)]
     
     while start <= numbermax:
-        pings = [verificar_status_ping(name, start, failed)]    
+        pings = [check_status_ping(name, start, failed)]    
         start +=1
 
     combination = list(set(lista + failed))
