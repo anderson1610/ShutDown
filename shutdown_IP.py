@@ -88,19 +88,25 @@ def create_log_file(name):
     month_current_number = current_time.month
     month_day_current = current_time.day
     date_today = date.today()
-    log_file = f"C:\\Users\\Administrator\\Desktop\\Log_Relatorios\\{month_current_number:02d}_Relatorios_{month_current}\\{month_day_current:02d}_Sala{name}_{date_today}.txt"
-    path = Path(f"C:\\Users\\Administrator\\Desktop\\Log_Relatorios\\{month_current_number:02d}_Relatorios_{month_current}")
+    log_file = f"C:\\Users\\Administrator\\Desktop\\Log_Desligar_Maquinas\\{month_current_number:02d}_Relatorios_{month_current}\\{month_day_current:02d}_Sala{name}_{date_today}.txt"
+    path = Path(f"C:\\Users\\Administrator\\Desktop\\Log_Desligar_Maquinas\\{month_current_number:02d}_Relatorios_{month_current}")
     path.mkdir(parents=True, exist_ok=True)
     return log_file
 
 def start_process():
-    name = sala_entry.get()
-    start = int(start_entry.get())
-    numbermax = int(numbermax_entry.get())
-    log_file = create_log_file(name)
-    desligar_maquinas(name, start, numbermax, log_file)
-    messagebox.showinfo("Processo concluído", "As máquinas foram desligadas e os resultados foram salvos no arquivo de log.")
+    rooms = [21, 22, 23, 31, 32, 33, 41, 42, 43, 51, 52, 53, 61, 62, 63] #Lista de salas da empresa
 
+    if int(sala_entry.get()) in rooms:
+        name = sala_entry.get()
+        start = int(start_entry.get())
+        numbermax = int(numbermax_entry.get())
+        log_file = create_log_file(name)
+        desligar_maquinas(name, start, numbermax, log_file)
+        messagebox.showinfo("Processo concluído", "As máquinas foram desligadas e os resultados foram salvos no arquivo de log.")
+
+    else:
+        messagebox.showinfo("Erro", "Sala não encontrada")
+        
 root = tk.Tk()
 root.title("Desligar Máquinas")
 root.geometry("300x200")
