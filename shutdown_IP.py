@@ -40,7 +40,7 @@ def ping(sala, maquina, password):
     stdout = txt.stdout
     return f"maquina 10.10.{sala}.{maquina} desligada com sucesso {date_e_clock}" if txt.returncode == 0 else password.append(maquina)
 
-def desligar_maquinas(name, start, numbermax, log_file):
+def shut_down(name, start, numbermax, log_file):
     failed = []
     password = []
     lista = [n for n in range(start, numbermax + 1)]
@@ -88,8 +88,8 @@ def create_log_file(name):
     month_current_number = current_time.month
     month_day_current = current_time.day
     date_today = date.today()
-    log_file = f"C:\\Users\\Administrator\\Desktop\\Log_Desligar_Maquinas\\{month_current_number:02d}_Relatorios_{month_current}\\{month_day_current:02d}_Sala{name}_{date_today}.txt"
-    path = Path(f"C:\\Users\\Administrator\\Desktop\\Log_Desligar_Maquinas\\{month_current_number:02d}_Relatorios_{month_current}")
+    log_file = f"C:\\Users\\Administrator\\Desktop\\Log_shut_down\\{month_current_number:02d}_Relatorios_{month_current}\\{month_day_current:02d}_Sala{name}_{date_today}.txt"
+    path = Path(f"C:\\Users\\Administrator\\Desktop\\Log_shut_down\\{month_current_number:02d}_Relatorios_{month_current}")
     path.mkdir(parents=True, exist_ok=True)
     return log_file
 
@@ -101,7 +101,7 @@ def start_process():
         start = int(start_entry.get())
         numbermax = int(numbermax_entry.get())
         log_file = create_log_file(name)
-        desligar_maquinas(name, start, numbermax, log_file)
+        shut_down(name, start, numbermax, log_file)
         messagebox.showinfo("Processo concluído", "As máquinas foram desligadas e os resultados foram salvos no arquivo de log.")
 
     else:
