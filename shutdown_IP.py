@@ -4,6 +4,43 @@ import locale
 from pathlib import Path
 import tkinter as tk
 from tkinter import messagebox
+import os
+import shutil
+
+def verify_psexec():
+
+    specific_folder = 'C:/Windows/System32'  # Substitua pelo caminho da pasta específica que deseja verificar
+    file_name = 'PsExec.exe'      # Substitua pelo nome do arquivo que deseja verificar
+    file_path = os.path.join(specific_folder, file_name)
+    path_destination = 'C:/Windows/System32/PsExec.exe'
+    path_psexec = 'C:/Users/Administrator/Downloads/PsExec.exe'
+
+
+    if os.path.exists(file_path):
+        subprocess.run(path_destination)
+        print(f"O arquivo {file_name} existe na pasta {specific_folder}.")
+        os.system("cls")
+        os.system("color 0A")
+        return True
+    else:
+        if os.path.exists(path_psexec):
+            print("Arquivo PsExec encontrado")
+            # Caminho do arquivo .exe original
+            original_path = 'C:/Users/Administrator/Downloads/PsExec.exe'
+
+            # Copiar o arquivo .exe para o destino desejado
+            shutil.copy(original_path, path_destination)
+
+            # Executar o arquivo .exe
+            subprocess.run(path_destination)  
+
+            return True         
+        
+        else:
+            messagebox.showinfo("ERRO!", "Coloque o arquivo PsExec.exe na pasta Downloads para realizarmos a instalação")
+            return False
+
+
 
 def month():
     locale.setlocale(locale.LC_ALL, '')
@@ -40,7 +77,7 @@ def ping(sala, maquina, password):
     stdout = txt.stdout
     return f"maquina 10.10.{sala}.{maquina} desligada com sucesso {date_e_clock}" if txt.returncode == 0 else password.append(maquina)
 
-def shut_down(name, start, numbermax, log_file):
+def desligar_maquinas(name, start, numbermax, log_file):
     failed = []
     password = []
     lista = [n for n in range(start, numbermax + 1)]
@@ -88,8 +125,8 @@ def create_log_file(name):
     month_current_number = current_time.month
     month_day_current = current_time.day
     date_today = date.today()
-    log_file = f"C:\\Users\\Administrator\\Desktop\\Log_shut_down\\{month_current_number:02d}_Relatorios_{month_current}\\{month_day_current:02d}_Sala{name}_{date_today}.txt"
-    path = Path(f"C:\\Users\\Administrator\\Desktop\\Log_shut_down\\{month_current_number:02d}_Relatorios_{month_current}")
+    log_file = f"C:\\Users\\Administrator\\Desktop\\Log_Desligar_Maquinas\\{month_current_number:02d}_Relatorios_{month_current}\\{month_day_current:02d}_Sala{name}_{date_today}.txt"
+    path = Path(f"C:\\Users\\Administrator\\Desktop\\Log_Desligar_Maquinas\\{month_current_number:02d}_Relatorios_{month_current}")
     path.mkdir(parents=True, exist_ok=True)
     return log_file
 
@@ -101,34 +138,41 @@ def start_process():
         start = int(start_entry.get())
         numbermax = int(numbermax_entry.get())
         log_file = create_log_file(name)
-        shut_down(name, start, numbermax, log_file)
+        desligar_maquinas(name, start, numbermax, log_file)
         messagebox.showinfo("Processo concluído", "As máquinas foram desligadas e os resultados foram salvos no arquivo de log.")
 
     else:
         messagebox.showinfo("Erro", "Sala não encontrada")
         
-root = tk.Tk()
-root.title("Desligar Máquinas")
-root.geometry("300x200")
 
-sala_label = tk.Label(root, text="Digite o número da sala:")
-sala_label.pack()
-sala_entry = tk.Entry(root)
-sala_entry.pack()
+if verify_psexec() == True:
 
-start_label = tk.Label(root, text="Digite qual máquina deseja iniciar:")
-start_label.pack()
-start_entry = tk.Entry(root)
-start_entry.pack()
+    root = tk.Tk()
+    root.title("Desligar Máquinas")
+    root.geometry("300x200")
 
-numbermax_label = tk.Label(root, text="Digite até qual máquina deseja desligar:")
-numbermax_label.pack()
-numbermax_entry = tk.Entry(root)
-numbermax_entry.pack()
+    sala_label = tk.Label(root, text="Digite o número da sala:")
+    sala_label.pack()
+    sala_entry = tk.Entry(root)
+    sala_entry.pack()
 
-start_button = tk.Button(root, text="Iniciar", command=start_process)
-start_button.pack()
+    start_label = tk.Label(root, text="Digite qual máquina deseja iniciar:")
+    start_label.pack()
+    start_entry = tk.Entry(root)
+    start_entry.pack()
 
-root.mainloop()
+    numbermax_label = tk.Label(root, text="Digite até qual máquina deseja desligar:")
+    numbermax_label.pack()
+    numbermax_entry = tk.Entry(root)
+    numbermax_entry.pack()
+
+    start_button = tk.Button(root, text="Iniciar", command=start_process)
+    start_button.pack()
+    assinatura_label = tk.Label(root, text="Desenvolvido por: Anderson Camargo", fg="gray")
+    assinatura_label.pack(side=tk.BOTTOM, padx=5, pady=5)
+    root.mainloop()
+
+else:
+    print("Verifique se possui o instalador do PsExec esta na pasta Downloads")
 
 #Desenvol. Anderson Camargo
