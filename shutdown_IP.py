@@ -6,14 +6,18 @@ import tkinter as tk
 from tkinter import messagebox
 import os
 import shutil
+import getpass
+
+def get_username():
+    return getpass.getuser()
 
 def verify_psexec():
-
+    name_user = get_username()
     specific_folder = 'C:/Windows/System32'  # Substitua pelo caminho da pasta específica que deseja verificar
     file_name = 'PsExec.exe'      # Substitua pelo nome do arquivo que deseja verificar
     file_path = os.path.join(specific_folder, file_name)
     path_destination = 'C:/Windows/System32/PsExec.exe'
-    path_psexec = 'C:/Users/Administrator/Downloads/PsExec.exe'
+    path_psexec = f'C:/Users/{name_user}/Downloads/PsExec.exe'
 
 
     if os.path.exists(file_path):
@@ -26,7 +30,7 @@ def verify_psexec():
         if os.path.exists(path_psexec):
             print("Arquivo PsExec encontrado")
             # Caminho do arquivo .exe original
-            original_path = 'C:/Users/Administrator/Downloads/PsExec.exe'
+            original_path = f'C:/Users/{name_user}/Downloads/PsExec.exe'
 
             # Copiar o arquivo .exe para o destino desejado
             shutil.copy(original_path, path_destination)
@@ -120,13 +124,14 @@ def desligar_maquinas(name, start, numbermax, log_file):
     error_password(name, password, log_file)
 
 def create_log_file(name):
+    name_user = get_username()
     current_time = datetime.now()
     month_current = month()
     month_current_number = current_time.month
     month_day_current = current_time.day
     date_today = date.today()
-    log_file = f"C:\\Users\\Administrator\\Desktop\\Log_Desligar_Maquinas\\{month_current_number:02d}_Relatorios_{month_current}\\{month_day_current:02d}_Sala{name}_{date_today}.txt"
-    path = Path(f"C:\\Users\\Administrator\\Desktop\\Log_Desligar_Maquinas\\{month_current_number:02d}_Relatorios_{month_current}")
+    log_file = f"C:\\Users\\{name_user}\\Desktop\\Log_Desligar_Maquinas\\{month_current_number:02d}_Relatorios_{month_current}\\{month_day_current:02d}_Sala{name}_{date_today}.txt"
+    path = Path(f"C:\\Users\\{name_user}\\Desktop\\Log_Desligar_Maquinas\\{month_current_number:02d}_Relatorios_{month_current}")
     path.mkdir(parents=True, exist_ok=True)
     return log_file
 
