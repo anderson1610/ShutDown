@@ -7,6 +7,15 @@ from tkinter import messagebox
 import os
 import shutil
 import getpass
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.application import MIMEApplication
+import smtplib
+
+# Credenciais do login
+email_username = ''
+email_password = ''
+email_client = '' #e-mail que receberá o arquivo
 
 def get_username():
     return getpass.getuser()
@@ -63,16 +72,16 @@ def check_status_ping(sala, maquina, failed):
 
 def error_password(sala, maquinas_com_senha_diferente, log_file):
     for l in maquinas_com_senha_diferente:
-        print(f'maquina 10.10.{sala}.{l} com senha ADM diferente\n')
+        print(f'-maquina 10.10.{sala}.{l} com senha ADM diferente\n')
         with open (log_file, "a", encoding='utf8') as arquivo:
-            arquivo.write(f'maquina 10.10.{sala}.{l} com senha ADM diferente\n')
+            arquivo.write(f'-maquina 10.10.{sala}.{l} com senha ADM diferente\n')
     
 
 def verify_machine(sala, failed, log_file):
     for maquina in failed:
-        print(f"Maquina 10.10.{sala}.{maquina} já estava desligada")
+        print(f"Maquina 10.10.{sala}.{maquina} estava desligada")
         with open(log_file, "a", encoding='utf8') as arquivo:
-            arquivo.write(f"Maquina 10.10.{sala}.{maquina} já estava desligada\n")
+            arquivo.write(f"-Maquina 10.10.{sala}.{maquina} estava desligada\n")
 
 def ping(sala, maquina, password):
     date_e_clock_today = datetime.now()
@@ -109,17 +118,17 @@ def desligar_maquinas(name, start, numbermax, log_file):
 
         with open (log_file, "a", encoding='utf8') as arquivo:
                     for p in pings: 
-                        arquivo.write(f'{p}\n')
+                        arquivo.write(f'-{p}\n')
 
     with open (log_file, "a", encoding='utf8') as arquivo:
         
-        arquivo.write("--------------- MAQUINAS NÃO DESLIGADAS ---------------\n")
+        arquivo.write("-=============== MAQUINAS NAO DESLIGADAS ===============\n")
 
     verify_machine(name, failed, log_file)
 
     with open (log_file, "a", encoding='utf8') as arquivo:
         
-        arquivo.write("--------------- MAQUINAS COM SENHAS DIFERENTES --------\n")
+        arquivo.write("-=============== MAQUINAS COM SENHAS DIFERENTES ========\n")
 
     error_password(name, password, log_file)
 
@@ -130,8 +139,8 @@ def create_log_file(name):
     month_current_number = current_time.month
     month_day_current = current_time.day
     date_today = date.today()
-    log_file = f"C:\\Users\\{name_user}\\Desktop\\Log_Desligar_Maquinas\\{month_current_number:02d}_Relatorios_{month_current}\\{month_day_current:02d}_Sala{name}_{date_today}.txt"
-    path = Path(f"C:\\Users\\{name_user}\\Desktop\\Log_Desligar_Maquinas\\{month_current_number:02d}_Relatorios_{month_current}")
+    log_file = f"C:\\Users\\{name_user}\\Desktop\\LOG Desligar Maquinas\\{month_current_number:02d}.Relatorios.{month_current}\\{date_today}_SALA{name}.txt"
+    path = Path(f"C:\\Users\\{name_user}\\Desktop\\LOG Desligar Maquinas\\{month_current_number:02d}.Relatorios.{month_current}")
     path.mkdir(parents=True, exist_ok=True)
     return log_file
 
@@ -145,15 +154,89 @@ def start_process():
         log_file = create_log_file(name)
         desligar_maquinas(name, start, numbermax, log_file)
         messagebox.showinfo("Processo concluído", "As máquinas foram desligadas e os resultados foram salvos no arquivo de log.")
+        estado_botao = atualizar_estado_checkbox()
+        if estado_botao == True:
+            send_email()
+        messagebox.showinfo("Concluído", "Troca de senha concluída com sucesso.")
 
     else:
         messagebox.showinfo("Erro", "Sala não encontrada")
-        
+
+def send_email():
+    # Configurações do servidor SMTP do office
+    smtp_server = 'smtp.office365.com'
+    smtp_port = 587
+    number_room = sala_entry.get()
+    log_file = create_log_file(number_room)
+
+    msg = MIMEMultipart()
+    msg['From'] = email_username
+    msg['To'] = email_client 
+    msg['Subject'] = f'SETUP SERVER - Arquivo maquinas desligadas | SALA: {number_room}'
+
+    nome_arquivo = log_file
+
+    # Inicializar a variável para armazenar o conteúdo do arquivo
+    conteudo_arquivo = None
+
+    # Tentar abrir e ler o arquivo
+    try:
+        with open(nome_arquivo, "r") as arquivo:
+            conteudo_arquivo = arquivo.read()
+            print("Conteúdo do arquivo lido com sucesso.")
+    except FileNotFoundError:
+        print(f"Arquivo '{nome_arquivo}' não encontrado.")
+    except Exception as e:
+        print(f"Ocorreu um erro ao ler o arquivo: {e}")
+
+    # Verificar se o conteúdo foi lido com sucesso
+    if conteudo_arquivo is not None:
+        # Faça o que quiser com a variável 'conteudo_arquivo'
+        print("Sucesso")
+        print(conteudo_arquivo)
+
+    minha_string_com_quebra = conteudo_arquivo.replace("-", "\n")
+
+    body = f"Segue arquivo TXT. \n\nRELATORIO: \n{minha_string_com_quebra}"
+    
+    msg.attach(MIMEText(body, 'plain'))
+
+    with open(log_file, "r") as f:
+        attachment = MIMEText(f.read())
+        attachment.add_header("Content-Disposition", "attachment", filename=log_file)
+        msg.attach(attachment)
+
+    server = smtplib.SMTP(smtp_server, smtp_port)
+    server.starttls()
+    server.login(email_username, email_password)
+    server.sendmail(email_username, email_client, msg.as_string())
+    server.quit()
+    print('Email enviado!')
+
+def validar_entrada(event):
+    # Obter o caractere inserido
+    char = event.char
+
+    # Verificar se o caractere é um dígito
+    if not char.isdigit() and char != '\x08':
+        return 'break'  # Impede a inserção do caractere no campo de entrada
+    
+def avancar_para_proximo_widget(event):
+    # Mova o foco para o próximo widget
+    event.widget.tk_focusNext().focus()
+    return 'break'
+
+def atualizar_estado_checkbox():
+    estado = checkbox_var.get()
+    if estado == 1:
+        return True
+    else:
+        return False
 
 if verify_psexec() == True:
 
     root = tk.Tk()
-    root.title("Desligar Máquinas")
+    root.title("Desligar Máquinas - Ka Solution")
     root.geometry("300x200")
 
     sala_label = tk.Label(root, text="Digite o número da sala:")
@@ -161,15 +244,34 @@ if verify_psexec() == True:
     sala_entry = tk.Entry(root)
     sala_entry.pack()
 
+    # Adicionar a função de validação da entrada, para apenas deixar o usuario digitar apenas numeros
+    sala_entry.bind("<Key>", validar_entrada)
+    sala_entry.bind("<Tab>", avancar_para_proximo_widget)
+
     start_label = tk.Label(root, text="Digite qual máquina deseja iniciar:")
     start_label.pack()
     start_entry = tk.Entry(root)
     start_entry.pack()
 
+    # Adicionar a função de validação da entrada, para apenas deixar o usuario digitar apenas numeros
+    start_entry.bind("<Key>", validar_entrada)
+    start_entry.bind("<Tab>", avancar_para_proximo_widget)
+
     numbermax_label = tk.Label(root, text="Digite até qual máquina deseja desligar:")
     numbermax_label.pack()
     numbermax_entry = tk.Entry(root)
     numbermax_entry.pack()
+
+    # Adicionar a função de validação da entrada, para apenas deixar o usuario digitar apenas numeros
+    numbermax_entry.bind("<Key>", validar_entrada)
+    numbermax_entry.bind("<Tab>", avancar_para_proximo_widget)
+
+    # Criar a variável de controle para a caixa de seleção
+    checkbox_var = tk.IntVar()
+
+    # Criar a caixa de seleção
+    checkbox = tk.Checkbutton(root, text="Enviar e-mail de LOG ", variable=checkbox_var, command=atualizar_estado_checkbox)
+    checkbox.pack()
 
     start_button = tk.Button(root, text="Iniciar", command=start_process)
     start_button.pack()
