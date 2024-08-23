@@ -15,7 +15,7 @@ import smtplib
 # Credenciais do login
 email_username = ''
 email_password = ''
-email_client = '' #e-mail que receberá o arquivo
+email_client = 'Anderson14833@gmail.com' #e-mail que receberá o arquivo
 
 def get_username():
     return getpass.getuser()
@@ -60,35 +60,35 @@ def month():
     today = datetime.today()
     return today.strftime("%b")
 
-def check_status_ping(sala, maquina, failed):
-    comando_ping = ['ping', '-n', '2', f"10.10.{sala}.{maquina}"]  # Comando 'ping' para Windows
+def check_status_ping(rack, maquina, failed):
+    comando_ping = ['ping', '-n', '2', f"10.10.{rack}.{maquina}"]  # Comando 'ping' para Windows
     resultado = subprocess.run(comando_ping, stdout=subprocess.PIPE)
     if resultado.returncode == 0:
-        print(f'O IP 10.10.{sala}.{maquina} está acessível.')
+        print(f'O IP 10.10.{rack}.{maquina} está acessível.')
     else:
         machine = int(maquina)
         failed.append(machine)
-        print(f'O IP 10.10.{sala}.{maquina} não está acessível.')
+        print(f'O IP 10.10.{rack}.{maquina} não está acessível.')
 
-def error_password(sala, maquinas_com_senha_diferente, log_file):
+def error_password(rack, maquinas_com_senha_diferente, log_file):
     for l in maquinas_com_senha_diferente:
-        print(f'-maquina 10.10.{sala}.{l} com senha ADM diferente\n')
+        print(f'-maquina 10.10.{rack}.{l} com senha ADM diferente\n')
         with open (log_file, "a", encoding='utf8') as arquivo:
-            arquivo.write(f'-maquina 10.10.{sala}.{l} com senha ADM diferente\n')
+            arquivo.write(f'-maquina 10.10.{rack}.{l} com senha ADM diferente\n')
     
 
-def verify_machine(sala, failed, log_file):
+def verify_machine(rack, failed, log_file):
     for maquina in failed:
-        print(f"Maquina 10.10.{sala}.{maquina} estava desligada")
+        print(f"Maquina 10.10.{rack}.{maquina} estava desligada")
         with open(log_file, "a", encoding='utf8') as arquivo:
-            arquivo.write(f"-Maquina 10.10.{sala}.{maquina} estava desligada\n")
+            arquivo.write(f"-Maquina 10.10.{rack}.{maquina} estava desligada\n")
 
-def ping(sala, maquina, password):
+def ping(rack, maquina, password):
     date_e_clock_today = datetime.now()
     date_e_clock = date_e_clock_today.strftime('%d/%m/%Y %H:%M')
-    txt = subprocess.run(f"shutdown /m \\\\10.10.{sala}.{maquina} /s /f /t 6", stdout=subprocess.PIPE)
+    txt = subprocess.run(f"shutdown /m \\\\10.10.{rack}.{maquina} /s /f /t 6", stdout=subprocess.PIPE)
     stdout = txt.stdout
-    return f"maquina 10.10.{sala}.{maquina} desligada com sucesso {date_e_clock}" if txt.returncode == 0 else password.append(maquina)
+    return f"maquina 10.10.{rack}.{maquina} desligada com sucesso {date_e_clock}" if txt.returncode == 0 else password.append(maquina)
 
 def desligar_maquinas(name, start, numbermax, log_file):
     failed = []
@@ -113,7 +113,7 @@ def desligar_maquinas(name, start, numbermax, log_file):
 
     for i in list_difference:
         pings = [ping(name, i, password)]
-        print(f"Maquina: {i} Sala: {name} | salvando arquivo..")
+        print(f"Maquina: {i} rack: {name} | salvando arquivo..")
         
 
         with open (log_file, "a", encoding='utf8') as arquivo:
@@ -139,16 +139,16 @@ def create_log_file(name):
     month_current_number = current_time.month
     month_day_current = current_time.day
     date_today = date.today()
-    log_file = f"C:\\Users\\{name_user}\\Desktop\\LOG Desligar Maquinas\\{month_current_number:02d}.Relatorios.{month_current}\\{date_today}_SALA{name}.txt"
+    log_file = f"C:\\Users\\{name_user}\\Desktop\\LOG Desligar Maquinas\\{month_current_number:02d}.Relatorios.{month_current}\\{date_today}_rack{name}.txt"
     path = Path(f"C:\\Users\\{name_user}\\Desktop\\LOG Desligar Maquinas\\{month_current_number:02d}.Relatorios.{month_current}")
     path.mkdir(parents=True, exist_ok=True)
     return log_file
 
 def start_process():
-    rooms = [21, 22, 23, 31, 32, 33, 41, 42, 43, 51, 52, 53, 61, 62, 63] #Lista de salas da empresa
+    rooms = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] #Lista de racks da empresa
 
-    if int(sala_entry.get()) in rooms:
-        name = sala_entry.get()
+    if int(rack_entry.get()) in rooms:
+        name = rack_entry.get()
         start = int(start_entry.get())
         numbermax = int(numbermax_entry.get())
         log_file = create_log_file(name)
@@ -157,22 +157,22 @@ def start_process():
         estado_botao = atualizar_estado_checkbox()
         if estado_botao == True:
             send_email()
-        messagebox.showinfo("Concluído", "Troca de senha concluída com sucesso.")
+        messagebox.showinfo("Concluído", "Processo finalizado")
 
     else:
-        messagebox.showinfo("Erro", "Sala não encontrada")
+        messagebox.showinfo("Erro", "rack não encontrada")
 
 def send_email():
     # Configurações do servidor SMTP do office
     smtp_server = 'smtp.office365.com'
     smtp_port = 587
-    number_room = sala_entry.get()
+    number_room = rack_entry.get()
     log_file = create_log_file(number_room)
 
     msg = MIMEMultipart()
     msg['From'] = email_username
     msg['To'] = email_client 
-    msg['Subject'] = f'SETUP SERVER - Arquivo maquinas desligadas | SALA: {number_room}'
+    msg['Subject'] = f'SETUP SERVER - Arquivo maquinas desligadas | Rack: {number_room}'
 
     nome_arquivo = log_file
 
@@ -239,14 +239,14 @@ if verify_psexec() == True:
     root.title("Desligar Máquinas - Ka Solution")
     root.geometry("300x200")
 
-    sala_label = tk.Label(root, text="Digite o número da sala:")
-    sala_label.pack()
-    sala_entry = tk.Entry(root)
-    sala_entry.pack()
+    rack_label = tk.Label(root, text="Digite o número do Rack:")
+    rack_label.pack()
+    rack_entry = tk.Entry(root)
+    rack_entry.pack()
 
     # Adicionar a função de validação da entrada, para apenas deixar o usuario digitar apenas numeros
-    sala_entry.bind("<Key>", validar_entrada)
-    sala_entry.bind("<Tab>", avancar_para_proximo_widget)
+    rack_entry.bind("<Key>", validar_entrada)
+    rack_entry.bind("<Tab>", avancar_para_proximo_widget)
 
     start_label = tk.Label(root, text="Digite qual máquina deseja iniciar:")
     start_label.pack()
