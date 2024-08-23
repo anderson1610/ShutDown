@@ -1,5 +1,4 @@
 # ShutDown
-Foi criado para uso corporativo, na empresa na qual trabalho possui muitas salas de aula e para facilitar o desligamento das maquinas criei esse script.
+Este script foi criado para uso corporativo na empresa onde trabalho, que possui muitas salas de aula. Para facilitar o desligamento das máquinas, desenvolvi este script.
 
-Para funcionar a maquina na qual o script irá rodar precisa estar logado a um usuario administrador, com nome e senha identicos as maquinas que deseja desligar.
-Ele possui funções que irá relatar qual maquina esta com senha diferente, o range de IP muda conforme a rede utilizadq, na variavel 'txt'.
+Para que o script funcione, a máquina na qual ele será executado precisa estar logada com um usuário administrador, com nome e senha idênticos às máquinas que se deseja desligar. O script possui funções que relatam quais máquinas estão com senhas diferentes. O intervalo de IP muda conforme a rede utilizada, definido na variável ‘txt’.
